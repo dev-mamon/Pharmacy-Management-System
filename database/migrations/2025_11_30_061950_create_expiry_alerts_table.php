@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('expiry_alerts', function (Blueprint $table) {
+             $table->id();
+            $table->foreignId('stock_id')->constrained()->onDelete('cascade');
+            $table->foreignId('branch_id')->constrained()->onDelete('cascade');
+            $table->date('expiry_date');
+            $table->integer('days_until_expiry');
+            $table->enum('alert_level', ['critical', 'warning', 'info']);
+            $table->boolean('is_notified')->default(false);
+            $table->timestamp('notified_at')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('expiry_alerts');
+    }
+};
