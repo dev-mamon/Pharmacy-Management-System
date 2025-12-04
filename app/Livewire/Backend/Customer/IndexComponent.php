@@ -17,29 +17,95 @@ class IndexComponent extends Component
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
 
-    public function sortBy($field)
+    public $selectedCustomers = [];
+    public $selectAll = false;
+    public $currentPageCustomerIds = [];
+
+    public function mount()
     {
-        if ($this->sortField === $field) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        // Initialize with current page customer IDs
+        $this->getCurrentPageCustomerIds();
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if ($value) {
+            // Get all customer IDs from the current page
+            $this->selectedCustomers = $this->getCurrentPageCustomerIds();
         } else {
-            $this->sortDirection = 'asc';
+            // Remove only current page IDs from selected
+            $currentPageIds = $this->getCurrentPageCustomerIds();
+            $this->selectedCustomers = array_diff($this->selectedCustomers, $currentPageIds);
         }
-        $this->sortField = $field;
     }
 
-    public function updatingSearch()
+    public function updatedSelectedCustomers()
     {
-        $this->resetPage();
+        // Update selectAll checkbox based on selected items
+        $currentPageIds = $this->getCurrentPageCustomerIds();
+        $selectedOnCurrentPage = array_intersect($this->selectedCustomers, $currentPageIds);
+        $this->selectAll = count($selectedOnCurrentPage) === count($currentPageIds);
     }
 
-    public function updatingPerPage()
+    protected function getCurrentPageCustomerIds()
     {
-        $this->resetPage();
+        if (empty($this->currentPageCustomerIds)) {
+            $customers = $this->customers()->get();
+            $this->currentPageCustomerIds = $customers->pluck('id')->toArray();
+        }
+
+        return $this->currentPageCustomerIds;
     }
 
-    public function updatingStatusFilter()
+    // Reset currentPageCustomerIds when pagination or filters change
+    public function updating($property, $value)
     {
-        $this->resetPage();
+        $resetProperties = ['search', 'perPage', 'statusFilter', 'sortField', 'sortDirection'];
+
+        if (in_array($property, $resetProperties)) {
+            $this->currentPageCustomerIds = [];
+            $this->selectAll = false;
+
+            if ($property !== 'perPage') {
+                $this->resetPage();
+            }
+        }
+
+        if ($property === 'page') {
+            $this->currentPageCustomerIds = [];
+            $this->selectAll = false;
+        }
+    }
+
+    /**
+     * Select all customers across all pages (filtered results)
+     */
+    public function selectAllCustomers()
+    {
+        $allCustomerIds = $this->customers()
+            ->pluck('id')
+            ->toArray();
+
+        $this->selectedCustomers = $allCustomerIds;
+
+        // Check if all current page items are selected
+        $currentPageIds = $this->getCurrentPageCustomerIds();
+        $selectedOnCurrentPage = array_intersect($this->selectedCustomers, $currentPageIds);
+        $this->selectAll = count($selectedOnCurrentPage) === count($currentPageIds);
+    }
+
+    /**
+     * Delete selected customers
+     */
+    public function deleteSelected()
+    {
+        if (!empty($this->selectedCustomers)) {
+            Customer::whereIn('id', $this->selectedCustomers)->delete();
+            $this->selectedCustomers = [];
+            $this->selectAll = false;
+            $this->currentPageCustomerIds = [];
+            session()->flash('success', 'Selected customers deleted successfully.');
+        }
     }
 
     public function deleteCustomer($customerId)
@@ -53,6 +119,15 @@ class IndexComponent extends Component
         }
 
         $customer->delete();
+
+        // Remove from selected customers if it was selected
+        if (in_array($customerId, $this->selectedCustomers)) {
+            $this->selectedCustomers = array_diff($this->selectedCustomers, [$customerId]);
+        }
+
+        // Clear cached IDs
+        $this->currentPageCustomerIds = [];
+
         session()->flash('message', 'Customer deleted successfully.');
     }
 
@@ -66,9 +141,20 @@ class IndexComponent extends Component
         session()->flash('message', 'Customer status updated successfully.');
     }
 
-    public function render()
+    public function sortBy($field)
     {
-        $customers = Customer::withCount(['sales', 'prescriptions'])
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+        $this->sortField = $field;
+    }
+
+    // Helper method to get customers query
+    protected function customers()
+    {
+        return Customer::withCount(['sales', 'prescriptions'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
@@ -80,8 +166,12 @@ class IndexComponent extends Component
             ->when($this->statusFilter, function ($query) {
                 $query->where('is_active', $this->statusFilter === 'active');
             })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
+            ->orderBy($this->sortField, $this->sortDirection);
+    }
+
+    public function render()
+    {
+        $customers = $this->customers()->paginate($this->perPage);
 
         return view('livewire.backend.customer.index-component', [
             'customers' => $customers,

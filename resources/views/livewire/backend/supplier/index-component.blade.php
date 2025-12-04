@@ -62,30 +62,39 @@
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <!-- Left Section: Search + Per Page -->
                     <div class="flex flex-col md:flex-row gap-3 md:items-center flex-1">
+
                         <!-- Search -->
-                        <div class="relative w-full max-w-xs">
-                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <div class="relative w-full md:max-w-xs">
+                            <i
+                                class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm"></i>
+
                             <input type="search" wire:model.live="search"
-                                class="w-full h-10 pl-10 pr-3 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                                class="w-full h-10 md:h-10 pl-10 pr-3 text-sm rounded-md border border-gray-300
+                   focus:outline-none focus:ring-1 focus:ring-orange-500
+                   md:w-full"
                                 placeholder="Search suppliers..." />
                         </div>
 
                         <!-- Items Per Page -->
-                        <div class="relative">
+                        <div class="relative w-full md:w-auto">
                             <select wire:model.live="perPage"
-                                class="h-10 w-24 pl-3 pr-8 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none">
+                                class="h-10 w-full md:w-24 pl-3 pr-8 rounded-lg border border-gray-300 bg-white
+                   text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500
+                   appearance-none">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
                                 <option value="25">25</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
                             </select>
-                            <div
-                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+
+                            <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-700">
                                 <i class="fas fa-chevron-down text-xs"></i>
                             </div>
                         </div>
+
                     </div>
+
 
                     <!-- Right Section: Sort Buttons -->
                     <div class="flex gap-2 flex-wrap justify-end">
@@ -174,11 +183,11 @@
                                 </td>
                                 <td class="px-5 py-3 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a wire:navigate href="{{ route('admin.suppliers.view', $supplier->id) }}"
+                                        {{-- <a wire:navigate href="{{ route('admin.suppliers.view', $supplier->id) }}"
                                             class="p-2 rounded bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors"
                                             title="View Supplier">
                                             <i class="far fa-eye"></i>
-                                        </a>
+                                        </a> --}}
                                         <a wire:navigate href="{{ route('admin.suppliers.edit', $supplier->id) }}"
                                             class="p-2 rounded bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
                                             title="Edit Supplier">

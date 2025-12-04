@@ -14,20 +14,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', IndexComponent::class)->name('dashboard');
 
-    // Branch Management
+    // Branch Management complete
     Route::get('/branches', \App\Livewire\Backend\Branch\IndexComponent::class)->name('branches.index');
     Route::get('/branches/create', \App\Livewire\Backend\Branch\CreateComponent::class)->name('branches.create');
-    Route::get('/branches/{branch}/edit', \App\Livewire\Backend\Branch\EditComponent::class)->name('branches.edit');
+    Route::get('/branches/{id}/edit', \App\Livewire\Backend\Branch\EditComponent::class)->name('branches.edit');
     Route::get('/branches/{branch}', \App\Livewire\Backend\Branch\ViewComponent::class)->name('branches.view');
 
     // Inventory Management
     // Medicines
     Route::get('/medicines', \App\Livewire\Backend\Medicine\IndexComponent::class)->name('medicines.index');
     Route::get('/medicines/create', \App\Livewire\Backend\Medicine\CreateComponent::class)->name('medicines.create');
-    Route::get('/medicines/{medicine}/edit', \App\Livewire\Backend\Medicine\EditComponent::class)->name('medicines.edit');
+    Route::get('/medicines/{id}/edit', \App\Livewire\Backend\Medicine\EditComponent::class)->name('medicines.edit');
     Route::get('/medicines/{medicine}', \App\Livewire\Backend\Medicine\ViewComponent::class)->name('medicines.view');
 
-    // Categories
+    // Categories  complete
     Route::get('/categories', \App\Livewire\Backend\Category\IndexComponent::class)->name('categories.index');
     Route::get('/categories/create', \App\Livewire\Backend\Category\CreateComponent::class)->name('categories.create');
     Route::get('/categories/{category}/edit', \App\Livewire\Backend\Category\EditComponent::class)->name('categories.edit');
@@ -82,11 +82,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/returns/{return}', \App\Livewire\Backend\Return\ViewComponent::class)->name('returns.view');
 
     // Customer Management
-    // Customers
+    // Customers complete
     Route::get('/customers', \App\Livewire\Backend\Customer\IndexComponent::class)->name('customers.index');
     Route::get('/customers/create', \App\Livewire\Backend\Customer\CreateComponent::class)->name('customers.create');
     Route::get('/customers/{customer}/edit', \App\Livewire\Backend\Customer\EditComponent::class)->name('customers.edit');
-    Route::get('/customers/{customer}', \App\Livewire\Backend\Customer\ViewComponent::class)->name('customers.view');
 
     // Prescriptions
     Route::get('/prescriptions', \App\Livewire\Backend\Prescription\IndexComponent::class)->name('prescriptions.index');

@@ -147,10 +147,10 @@
                                 </td>
                                 <td class="px-5 py-3 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a wire:navigate href="{{ route('admin.branches.view', $branch->id) }}"
+                                        {{-- <a wire:navigate href="{{ route('admin.branches.view', $branch->id) }}"
                                             class="p-2 rounded bg-orange-50 text-orange-600 hover:bg-orange-100">
                                             <i class="far fa-eye"></i>
-                                        </a>
+                                        </a> --}}
                                         <a wire:navigate href="{{ route('admin.branches.edit', $branch->id) }}"
                                             class="p-2 rounded bg-blue-50 text-blue-600 hover:bg-blue-100">
                                             <i class="far fa-edit"></i>
@@ -231,11 +231,11 @@
                             </div>
 
                             <div class="flex items-start gap-2">
-                                <a wire:navigate href="{{ route('admin.branches.view', $branch->id) }}"
+                                {{-- <a wire:navigate href="{{ route('admin.branches.view', $branch->id) }}"
                                     class="bg-white text-gray-500 hover:text-orange-500 p-2 rounded border border-gray-300"
                                     aria-label="View {{ $branch->name }}">
                                     <i class="far fa-eye" aria-hidden="true"></i>
-                                </a>
+                                </a> --}}
                                 <a wire:navigate href="{{ route('admin.branches.edit', $branch->id) }}"
                                     class="bg-white text-gray-500 hover:text-orange-500 p-2 rounded border border-gray-300"
                                     aria-label="Edit {{ $branch->name }}">

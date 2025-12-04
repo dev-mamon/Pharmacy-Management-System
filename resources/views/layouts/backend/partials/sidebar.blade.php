@@ -60,6 +60,19 @@
             Inventory
         </div>
         <ul class="space-y-1">
+
+            <li>
+                <a wire:navigate href="{{ route('admin.categories.index') }}"
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M4 7h16M4 12h16M4 17h16" />
+                    </svg>
+                    <span x-show="!sidebarCollapsed || sidebarHovered" x-transition class="whitespace-nowrap text-sm">
+                        Medicine Groups
+                    </span>
+                </a>
+            </li>
             <li>
                 <a wire:navigate href="{{ route('admin.medicines.index') }}"
                     class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
@@ -74,18 +87,7 @@
                     </span>
                 </a>
             </li>
-            <li>
-                <a wire:navigate href="{{ route('admin.categories.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
-                    <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M4 7h16M4 12h16M4 17h16" />
-                    </svg>
-                    <span x-show="!sidebarCollapsed || sidebarHovered" x-transition class="whitespace-nowrap text-sm">
-                        Categories
-                    </span>
-                </a>
-            </li>
+
             <li>
                 <a wire:navigate href="{{ route('admin.suppliers.index') }}"
                     class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">

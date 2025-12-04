@@ -4,10 +4,10 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">
-                    Medicine Categories
+                    Medicine Groups
                 </h1>
                 <p class="text-sm text-gray-600 mt-1">
-                    Manage and organize your medicine categories
+                    Manage and organize your medicine groups
                 </p>
             </div>
 
@@ -37,7 +37,7 @@
                         <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             d="M12 5v14M5 12h14" />
                     </svg>
-                    <span class="hidden sm:inline">Add Category</span>
+                    <span class="hidden sm:inline">Add Medicine Group</span>
                 </a>
             </div>
         </div>
@@ -110,7 +110,7 @@
                 <table class="w-full">
                     <thead class="bg-gray-50 text-xs font-semibold text-left text-gray-500">
                         <tr class="text-sm font-semibold text-gray-600 tracking-wide uppercase">
-                            <th scope="col" class="px-5 py-3">Category Name</th>
+                            <th scope="col" class="px-5 py-3">Medicine Group Name</th>
                             <th scope="col" class="px-5 py-3">Description</th>
                             <th scope="col" class="px-5 py-3">Medicines Count</th>
                             <th scope="col" class="px-5 py-3">Status</th>
@@ -263,12 +263,11 @@
                         <p class="text-sm text-gray-600 mb-4">Get started by creating your first category.</p>
                         <a wire:navigate href="{{ route('admin.categories.create') }}"
                             class="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-600 transition-colors">
-                            Create Category
+                            Create Medicine Group
                         </a>
                     </div>
                 @endforelse
             </div>
-
             <!-- Pagination -->
             <x-common.pagination :paginator="$categories" :pageRange="$pageRange" />
         </div>
