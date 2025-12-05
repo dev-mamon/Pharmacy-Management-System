@@ -1,10 +1,11 @@
 <aside @mouseenter="sidebarHovered = true" @mouseleave="sidebarHovered = false"
     :class="[
-        'bg-white text-gray-800 shadow-xl transition-all duration-300 fixed lg:static z-50 h-screen',
+        'bg-white text-gray-800 shadow-xl transition-all duration-300 fixed lg:static z-50 h-screen overflow-y-auto no-scrollbar',
         mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         (sidebarCollapsed && !sidebarHovered) ? 'sidebar-collapsed' : 'sidebar-expanded'
-    ]">
-    <div class="flex h-16 items-center justify-center border-b border-gray-200">
+    ]"
+    id="sidebar">
+    <div class="flex h-16 items-center justify-center border-b border-gray-200 sticky top-0 bg-white z-10">
         <div class="flex items-center gap-3 px-3">
             <svg class="h-6 w-6 text-orange-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
@@ -18,7 +19,7 @@
         </div>
     </div>
 
-    <nav class="h-full overflow-y-auto p-4 no-scrollbar pb-20">
+    <nav class="p-4 pb-20" id="sidebar-nav">
         <!-- Main Menu -->
         <div x-show="!sidebarCollapsed || sidebarHovered" x-transition class="text-sm font-semibold text-gray-500 mb-2">
             Main
@@ -26,7 +27,7 @@
         <ul class="space-y-1">
             <li>
                 <a wire:navigate href="{{ route('admin.dashboard') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.dashboard') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M3 12l9-9 9 9"></path>
@@ -39,7 +40,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.branches.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.branches.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path
@@ -60,10 +61,9 @@
             Inventory
         </div>
         <ul class="space-y-1">
-
             <li>
                 <a wire:navigate href="{{ route('admin.categories.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.categories.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M4 7h16M4 12h16M4 17h16" />
@@ -75,7 +75,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.medicines.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.medicines.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path
@@ -87,10 +87,9 @@
                     </span>
                 </a>
             </li>
-
             <li>
                 <a wire:navigate href="{{ route('admin.suppliers.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.suppliers.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <rect width="7" height="7" x="3" y="3" rx="1" />
@@ -105,7 +104,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.stocks.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.stocks.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
@@ -118,7 +117,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.purchases.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.purchases.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
@@ -130,7 +129,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.low-stock.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.low-stock.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
@@ -142,7 +141,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.expiry-alerts.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.expiry-alerts.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <circle cx="12" cy="12" r="10" />
@@ -156,7 +155,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.stock-transfers.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.stock-transfers.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M8 17l4 4 4-4m-4-4v12M3 3h18M3 9h18M3 15h18"></path>
@@ -178,7 +177,7 @@
         <ul class="space-y-1">
             <li>
                 <a wire:navigate href="{{ route('admin.pos.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.pos.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <rect width="20" height="14" x="2" y="5" rx="2" />
@@ -191,7 +190,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.sales.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.sales.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -204,7 +203,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.invoices.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.invoices.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -220,7 +219,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.returns.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.returns.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M9 10l4-4-4-4" />
@@ -244,7 +243,7 @@
         <ul class="space-y-1">
             <li>
                 <a wire:navigate href="{{ route('admin.customers.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.customers.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -259,7 +258,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.prescriptions.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.prescriptions.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -275,7 +274,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.loyalty.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.loyalty.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <polygon
@@ -298,7 +297,7 @@
         <ul class="space-y-1">
             <li>
                 <a wire:navigate href="{{ route('admin.expenses.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.expenses.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
@@ -310,7 +309,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.shifts.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.shifts.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <circle cx="12" cy="12" r="10" />
@@ -323,7 +322,7 @@
             </li>
             <li>
                 <a wire:navigate href="{{ route('admin.reports.sales') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.reports.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path
@@ -348,7 +347,7 @@
         <ul class="space-y-1">
             <li>
                 <a wire:navigate href="{{ route('admin.users.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.users.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -363,7 +362,7 @@
             </li>
             <li x-data="{ open: false }">
                 <button @click="open = !open"
-                    class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.settings.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <div class="flex items-center gap-3">
                         <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
@@ -387,7 +386,7 @@
                     class="mt-1 ms-9 space-y-1 text-[13px] text-gray-600">
                     <li>
                         <a wire:navigate href="{{ route('admin.settings.general') }}"
-                            class="block rounded-md px-2 py-1 transition hover:bg-orange-50 hover:text-orange-500">
+                            class="block rounded-md px-2 py-1 transition hover:bg-orange-50 hover:text-orange-500 {{ request()->routeIs('admin.settings.general') ? 'bg-orange-50 text-orange-500' : '' }}">
                             <svg class="inline-block me-2 h-2 w-2" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10" />
@@ -397,7 +396,7 @@
                     </li>
                     <li>
                         <a wire:navigate href="{{ route('admin.settings.tax') }}"
-                            class="block rounded-md px-2 py-1 transition hover:bg-orange-50 hover:text-orange-500">
+                            class="block rounded-md px-2 py-1 transition hover:bg-orange-50 hover:text-orange-500 {{ request()->routeIs('admin.settings.tax') ? 'bg-orange-50 text-orange-500' : '' }}">
                             <svg class="inline-block me-2 h-2 w-2" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10" />
@@ -407,7 +406,7 @@
                     </li>
                     <li>
                         <a wire:navigate href="{{ route('admin.settings.discounts') }}"
-                            class="block rounded-md px-2 py-1 transition hover:bg-orange-50 hover:text-orange-500">
+                            class="block rounded-md px-2 py-1 transition hover:bg-orange-50 hover:text-orange-500 {{ request()->routeIs('admin.settings.discounts') ? 'bg-orange-50 text-orange-500' : '' }}">
                             <svg class="inline-block me-2 h-2 w-2" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10" />
@@ -417,7 +416,7 @@
                     </li>
                     <li>
                         <a wire:navigate href="{{ route('admin.settings.payment') }}"
-                            class="block rounded-md px-2 py-1 transition hover:bg-orange-50 hover:text-orange-500">
+                            class="block rounded-md px-2 py-1 transition hover:bg-orange-50 hover:text-orange-500 {{ request()->routeIs('admin.settings.payment') ? 'bg-orange-50 text-orange-500' : '' }}">
                             <svg class="inline-block me-2 h-2 w-2" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10" />
@@ -430,7 +429,7 @@
 
             <li>
                 <a wire:navigate href="{{ route('admin.audit-logs.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.audit-logs.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -447,7 +446,7 @@
 
             <li>
                 <a wire:navigate href="{{ route('admin.notifications.index') }}"
-                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.notifications.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -460,8 +459,7 @@
             </li>
 
             <li>
-                <a wire:navigate href=""
-                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                <a wire:navigate="" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                     class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm">
                     <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">

@@ -11,12 +11,18 @@
 
         <!-- Desktop Menu Button -->
         <button @click="sidebarCollapsed = !sidebarCollapsed"
-            class="hidden lg:inline-flex items-center justify-center rounded-xl text-sm bg-gray-50 hover:bg-gray-100 active:scale-95 transition-all duration-200 h-10 w-10">
-            <svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            class="hidden lg:flex items-center justify-center h-6 w-6 rounded-full
+           bg-orange-400 text-white hover:bg-orange-500 active:scale-95
+           transition-all duration-200 shadow-sm">
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                class="text-white">
+                <polyline points="11 17 6 12 11 7"></polyline>
+                <polyline points="18 17 13 12 18 7"></polyline>
             </svg>
         </button>
+
 
         <!-- Brand/Logo - Hidden on mobile when search is open -->
         <div class="hidden sm:block flex-shrink-0" x-show="!searchOpen">
@@ -74,12 +80,7 @@
 
                 <!-- Search Header -->
                 <div class="flex items-center gap-3 p-4 border-b border-gray-100 bg-white">
-                    <button @click="searchOpen = false"
-                        class="p-2 rounded-xl hover:bg-gray-50 active:scale-95 transition-all duration-200">
-                        <svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
+
                     <div class="flex-1 relative">
                         <svg class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">

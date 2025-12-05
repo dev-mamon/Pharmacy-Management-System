@@ -73,4 +73,24 @@ class Stock extends Model
     {
         return $query->where('quantity', '>', 0);
     }
+
+      public function isLowStock()
+    {
+        return $this->quantity <= $this->reorder_level && $this->quantity > 0;
+    }
+
+    public function isOutOfStock()
+    {
+        return $this->quantity <= 0;
+    }
+
+    public function isExpiringSoon()
+    {
+        return $this->expiry_date <= now()->addDays(30);
+    }
+
+    public function isExpired()
+    {
+        return $this->expiry_date <= now();
+    }
 }

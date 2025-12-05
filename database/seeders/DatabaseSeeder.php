@@ -34,6 +34,8 @@ class DatabaseSeeder extends Seeder
             PaymentMethodSeeder::class,
             LoyaltyProgramSeeder::class,
             ExpiryAlertsSeeder::class,
+            PurchaseSeeder::class,
+            StockTransferSeeder::class
         ]);
     }
 }

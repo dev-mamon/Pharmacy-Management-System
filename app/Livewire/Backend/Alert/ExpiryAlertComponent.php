@@ -160,7 +160,7 @@ class ExpiryAlertComponent extends Component
                 'info' => 'Info'
             ],
             'branches' => \App\Models\Branch::all(),
-             'paginator' => $alerts,
+            'paginator' => $alerts,
             'pageRange' => $this->getPageRange($alerts),
         ])->layout('layouts.backend.app');
     }

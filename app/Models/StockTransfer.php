@@ -43,4 +43,13 @@ class StockTransfer extends Model
     {
         return $this->hasMany(TransferItem::class);
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->transfer_number = 'TRF-' . date('Ymd') . '-' . str_pad(static::count() + 1, 4, '0', STR_PAD_LEFT);
+        });
+    }
 }

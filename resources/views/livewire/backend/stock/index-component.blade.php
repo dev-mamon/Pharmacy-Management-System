@@ -12,6 +12,27 @@
             </div>
 
             <div class="flex items-center gap-3 flex-wrap">
+                @if (count($selectedStocks) > 0)
+                    <button wire:click="deleteSelected"
+                        wire:confirm="Are you sure you want to delete selected stock records?"
+                        class="bg-red-500 text-white hover:bg-red-600 active:scale-95 transition-all duration-200 text-sm flex items-center px-3 sm:px-4 py-2 gap-2 rounded border border-red-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span class="hidden sm:inline">Delete Selected ({{ count($selectedStocks) }})</span>
+                    </button>
+                @endif
+
+                <!-- Select All Button -->
+                <button wire:click="selectAllStocks"
+                    class="bg-gray-100 text-gray-700 hover:bg-gray-200 active:scale-95 transition-all duration-200 text-sm flex items-center px-3 sm:px-4 py-2 gap-2 rounded border border-gray-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span class="hidden sm:inline">Select All</span>
+                </button>
+
                 <button type="button"
                     class="bg-white text-gray-500 hover:text-orange-500 active:scale-95 transition-all duration-200 text-sm flex items-center px-3 sm:px-4 py-2 gap-2 rounded border border-gray-300">
                     <!-- PDF Icon -->
@@ -42,6 +63,25 @@
             </div>
         </div>
 
+        <!-- Flash Messages -->
+        @if (session()->has('message'))
+            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                {{ session('message') }}
+            </div>
+        @endif
+
+        @if (session()->has('error'))
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session()->has('success'))
+            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <!-- Stock Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Total Stock Card -->
@@ -66,7 +106,7 @@
                     <div>
                         <p class="text-sm font-medium text-gray-600">Low Stock</p>
                         <p class="text-2xl font-bold text-orange-600 mt-1">
-                            {{ $stocks->where('quantity', '<=', \DB::raw('reorder_level'))->count() }}
+                            {{ $stocks->where('quantity', '<=', \DB::raw('reorder_level'))->where('quantity', '>', 0)->count() }}
                         </p>
                     </div>
                     <div class="p-3 bg-orange-100 rounded-lg">
@@ -123,7 +163,8 @@
                     <div class="flex flex-col md:flex-row gap-3 md:items-center flex-1">
                         <!-- Search -->
                         <div class="relative w-full max-w-xs">
-                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <i
+                                class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                             <input type="search" wire:model.live="search"
                                 class="w-full h-10 pl-10 pr-3 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-orange-500"
                                 placeholder="Search stock..." />
@@ -220,6 +261,10 @@
                 <table class="w-full">
                     <thead class="bg-gray-50 text-xs font-semibold text-left text-gray-500">
                         <tr class="text-sm font-semibold text-gray-600 tracking-wide uppercase">
+                            <th scope="col" class="px-5 py-3 w-10">
+                                <input type="checkbox" wire:model.live="selectAll"
+                                    class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                            </th>
                             <th scope="col" class="px-5 py-3">Medicine</th>
                             <th scope="col" class="px-5 py-3">Branch</th>
                             <th scope="col" class="px-5 py-3">Batch No</th>
@@ -233,6 +278,11 @@
                     <tbody class="bg-white divide-y divide-gray-100">
                         @forelse($stocks as $stock)
                             <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-5 py-3">
+                                    <input type="checkbox" wire:model.live="selectedStocks"
+                                        value="{{ $stock->id }}"
+                                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                </td>
                                 <td class="px-5 py-3">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -342,7 +392,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-5 py-12 text-center text-gray-500">
+                                <td colspan="9" class="px-5 py-12 text-center text-gray-500">
                                     <div class="flex flex-col items-center justify-center">
                                         <svg class="w-16 h-16 text-gray-400 mb-4" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24">
@@ -371,6 +421,9 @@
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-3 mb-2">
+                                    <input type="checkbox" wire:model.live="selectedStocks"
+                                        value="{{ $stock->id }}"
+                                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                                     <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                                         <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">

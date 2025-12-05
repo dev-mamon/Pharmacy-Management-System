@@ -47,8 +47,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Purchases
     Route::get('/purchases', \App\Livewire\Backend\Purchase\IndexComponent::class)->name('purchases.index');
     Route::get('/purchases/create', \App\Livewire\Backend\Purchase\CreateComponent::class)->name('purchases.create');
-    Route::get('/purchases/{purchase}/edit', \App\Livewire\Backend\Purchase\EditComponent::class)->name('purchases.edit');
-    Route::get('/purchases/{purchase}', \App\Livewire\Backend\Purchase\ViewComponent::class)->name('purchases.view');
+    Route::get('/purchases/{id}/edit', \App\Livewire\Backend\Purchase\EditComponent::class)->name('purchases.edit');
+    Route::get('/purchases/{id}', \App\Livewire\Backend\Purchase\ViewComponent::class)->name('purchases.view');
 
     // Alerts
     Route::get('/low-stock', \App\Livewire\Backend\Alert\LowStockComponent::class)->name('low-stock.index');

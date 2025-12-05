@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DreamsPOS - Badge Categories</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     @livewireStyles
     <style>
@@ -55,7 +56,7 @@
 
         <!-- Mobile Menu Button -->
         <button @click="mobileSidebarOpen = !mobileSidebarOpen"
-            class="lg:hidden p-2 text-gray-800 bg-white rounded-md fixed top-3 left-4 z-50 shadow-sm">
+            class="lg:hidden p-2 text-gray-800 bg-white  fixed top-2 left-4 z-10 ">
             <i class="fas fa-bars text-xl"></i>
         </button>
 

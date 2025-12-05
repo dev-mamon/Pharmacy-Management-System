@@ -13,7 +13,6 @@ class LowStockAlert extends Model
         'stock_id',
         'branch_id',
         'current_quantity',
-        'reorder_level',
         'is_notified',
         'notified_at',
     ];
