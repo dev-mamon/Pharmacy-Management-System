@@ -2,21 +2,28 @@
 
 namespace App\Livewire\Backend\Medicine;
 
-use Livewire\Component;
-use App\Models\Medicine;
 use App\Models\Category;
-use Illuminate\Support\Str;
+use App\Models\Medicine;
+use Livewire\Component;
 
 class CreateComponent extends Component
 {
     public $name;
+
     public $generic_name;
+
     public $brand_name;
+
     public $strength;
+
     public $category_id;
+
     public $description;
+
     public $side_effects;
+
     public $manufacturer;
+
     public $requires_prescription = false;
 
     protected $rules = [
@@ -54,10 +61,11 @@ class CreateComponent extends Component
             ]);
 
             session()->flash('message', 'Medicine created successfully.');
+
             return $this->redirect('/admin/medicines', navigate: true);
 
         } catch (\Exception $e) {
-            session()->flash('error', 'Error creating medicine: ' . $e->getMessage());
+            session()->flash('error', 'Error creating medicine: '.$e->getMessage());
         }
     }
 

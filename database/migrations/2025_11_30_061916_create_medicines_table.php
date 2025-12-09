@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('manufacturer')->nullable();
             $table->boolean('requires_prescription')->default(false);
             $table->boolean('is_active')->default(true);
+            $table->integer('total_sold')->default(0);
             $table->timestamps();
         });
     }

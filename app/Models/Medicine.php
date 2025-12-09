@@ -20,6 +20,7 @@ class Medicine extends Model
         'manufacturer',
         'requires_prescription',
         'is_active',
+        'total_sold',
     ];
 
     protected $casts = [
@@ -66,7 +67,7 @@ class Medicine extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'medicine_category')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     public function medicineCategories()

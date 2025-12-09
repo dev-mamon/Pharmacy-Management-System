@@ -1,8 +1,8 @@
 <?php
 
-
 use App\Livewire\Backend\Dashboard\IndexComponent;
 use Illuminate\Support\Facades\Route;
+
 // Main Routes
 Route::get('/', function () {
     return redirect()->route('admin.dashboard');
@@ -68,8 +68,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Sales
     Route::get('/sales', \App\Livewire\Backend\Sale\IndexComponent::class)->name('sales.index');
     Route::get('/sales/create', \App\Livewire\Backend\Sale\CreateComponent::class)->name('sales.create');
-    Route::get('/sales/{sale}/edit', \App\Livewire\Backend\Sale\EditComponent::class)->name('sales.edit');
-    Route::get('/sales/{sale}', \App\Livewire\Backend\Sale\ViewComponent::class)->name('sales.view');
+    Route::get('/sales/{id}/edit', \App\Livewire\Backend\Sale\EditComponent::class)->name('sales.edit');
+    Route::get('/sales/{id}', \App\Livewire\Backend\Sale\ViewComponent::class)->name('sales.view');
 
     // Invoices
     Route::get('/invoices', \App\Livewire\Backend\Invoice\IndexComponent::class)->name('invoices.index');

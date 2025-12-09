@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Category;
 use App\Models\Medicine;
+use Illuminate\Database\Seeder;
 
 class MedicineSeeder extends Seeder
 {
@@ -257,8 +257,8 @@ class MedicineSeeder extends Seeder
             // Ensure the category exists (or create it if you prefer)
             $category = Category::firstOrCreate(['name' => $categoryName], [
                 'name' => $categoryName,
-                'description' => $categoryName . ' Category',
-                'is_active' => true
+                'description' => $categoryName.' Category',
+                'is_active' => true,
             ]);
 
             foreach ($medicineArray as $data) {
@@ -268,11 +268,12 @@ class MedicineSeeder extends Seeder
                     'brand_name' => $data[2],
                     'strength' => $data[3],
                     'category_id' => $category->id,
-                    'description' => "Used for treatment involving " . $data[1],
+                    'description' => 'Used for treatment involving '.$data[1],
                     'side_effects' => 'Consult doctor for side effects.',
                     'manufacturer' => 'Global Pharma Ltd.',
                     'requires_prescription' => true,
                     'is_active' => true,
+                    'total_sold' => 0,
                 ]);
             }
         }
