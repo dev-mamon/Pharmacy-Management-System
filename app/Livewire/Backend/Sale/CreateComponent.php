@@ -8,29 +8,46 @@ use App\Models\Medicine;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Stock;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class CreateComponent extends Component
 {
     public $medicineSearch = '';
+
     public $dropdownSearch = '';
+
     public $customerSearch = '';
 
     public $medicineItems = [];
+
     public $customerName = '';
+
     public $customerPhone = '';
+
     public $customerId = null;
+
     public $notes = '';
+
     public $saleDate;
+
     public $branchId;
+
     public $paymentMethod = 'cash';
+
     public $discount = 0;
+
     public $taxRate = 0;
+
     public $subTotal = 0;
+
     public $taxAmount = 0;
+
     public $grandTotal = 0;
+
     public $showMedicineDropdown = false;
+
     public $showCustomerDropdown = false;
 
     protected $listeners = ['refresh' => '$refresh'];
@@ -55,7 +72,7 @@ class CreateComponent extends Component
     // Get filtered medicines for dropdown with search
     public function getFilteredMedicinesProperty()
     {
-        if (!$this->branchId) {
+        if (! $this->branchId) {
             return collect();
         }
 
@@ -68,9 +85,9 @@ class CreateComponent extends Component
         // Apply search filter
         if ($this->dropdownSearch) {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->dropdownSearch . '%')
-                  ->orWhere('generic_name', 'like', '%' . $this->dropdownSearch . '%')
-                  ->orWhere('brand_name', 'like', '%' . $this->dropdownSearch . '%');
+                $q->where('name', 'like', '%'.$this->dropdownSearch.'%')
+                    ->orWhere('generic_name', 'like', '%'.$this->dropdownSearch.'%')
+                    ->orWhere('brand_name', 'like', '%'.$this->dropdownSearch.'%');
             });
         }
 
@@ -99,9 +116,9 @@ class CreateComponent extends Component
 
         return Customer::where('is_active', true)
             ->where(function ($query) {
-                $query->where('name', 'like', '%' . $this->customerSearch . '%')
-                    ->orWhere('phone', 'like', '%' . $this->customerSearch . '%')
-                    ->orWhere('customer_id', 'like', '%' . $this->customerSearch . '%');
+                $query->where('name', 'like', '%'.$this->customerSearch.'%')
+                    ->orWhere('phone', 'like', '%'.$this->customerSearch.'%')
+                    ->orWhere('customer_id', 'like', '%'.$this->customerSearch.'%');
             })
             ->limit(15)
             ->get();
@@ -110,8 +127,9 @@ class CreateComponent extends Component
     // Show medicine dropdown
     public function showMedicineDropdown()
     {
-        if (!$this->branchId) {
+        if (! $this->branchId) {
             session()->flash('error', 'Please select a branch first!');
+
             return;
         }
 
@@ -147,8 +165,9 @@ class CreateComponent extends Component
     // Select medicine with branch-specific stock
     public function selectMedicine($medicineId)
     {
-        if (!$this->branchId) {
+        if (! $this->branchId) {
             session()->flash('error', 'Please select a branch first!');
+
             return;
         }
 
@@ -158,15 +177,17 @@ class CreateComponent extends Component
                 ->orderBy('expiry_date');
         }])->find($medicineId);
 
-        if (!$medicine) {
+        if (! $medicine) {
             session()->flash('error', 'Medicine not found!');
+
             return;
         }
 
         $stock = $medicine->stocks->first();
 
-        if (!$stock) {
+        if (! $stock) {
             session()->flash('error', 'No stock available for this medicine in selected branch!');
+
             return;
         }
 
@@ -175,6 +196,7 @@ class CreateComponent extends Component
 
         if ($availableStock <= 0) {
             session()->flash('error', 'No stock available for this medicine!');
+
             return;
         }
 
@@ -185,9 +207,11 @@ class CreateComponent extends Component
                 if ($newQuantity <= $availableStock) {
                     $this->medicineItems[$index]['quantity'] = $newQuantity;
                     $this->calculateTotals();
+
                     return;
                 } else {
                     session()->flash('error', 'Cannot add more. Stock limit reached!');
+
                     return;
                 }
             }
@@ -267,7 +291,7 @@ class CreateComponent extends Component
         }
 
         // Show dropdown when typing in customer search
-        if ($propertyName === 'customerSearch' && !empty($value)) {
+        if ($propertyName === 'customerSearch' && ! empty($value)) {
             $this->showCustomerDropdown = true;
         }
     }
@@ -349,13 +373,13 @@ class CreateComponent extends Component
             } else {
                 $customer = Customer::where('phone', $this->customerPhone)->first();
 
-                if (!$customer && $this->customerPhone) {
+                if (! $customer && $this->customerPhone) {
                     $customerId = 'CUST-'.str_pad(Customer::count() + 1, 6, '0', STR_PAD_LEFT);
 
                     $customer = Customer::create(array_merge($customerData, [
                         'customer_id' => $customerId,
                     ]));
-                } elseif (!$this->customerPhone) {
+                } elseif (! $this->customerPhone) {
                     $customer = null;
                 }
             }
@@ -396,12 +420,12 @@ class CreateComponent extends Component
             foreach ($this->medicineItems as $item) {
                 $stock = Stock::find($item['stock_id']);
 
-                if (!$stock) {
-                    throw new \Exception('Stock not found for medicine: '.$item['medicine_name']);
+                if (! $stock) {
+                    throw new Exception('Stock not found for medicine: '.$item['medicine_name']);
                 }
 
                 if ($stock->quantity < $item['quantity']) {
-                    throw new \Exception('Insufficient stock for '.$item['medicine_name'].'. Available: '.$stock->quantity);
+                    throw new Exception('Insufficient stock for '.$item['medicine_name'].'. Available: '.$stock->quantity);
                 }
 
                 $itemProfit = ($item['unit_price'] - $item['purchase_price']) * $item['quantity'];

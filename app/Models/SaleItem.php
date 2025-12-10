@@ -43,4 +43,19 @@ class SaleItem extends Model
     {
         return $this->hasMany(SalesReturnItem::class);
     }
+
+    public function returnItems()
+    {
+        return $this->hasMany(SalesReturnItem::class);
+    }
+
+    public function getReturnedQuantityAttribute(): int
+    {
+        return $this->returnItems()->sum('return_quantity');
+    }
+
+    public function getRemainingQuantityAttribute(): int
+    {
+        return $this->quantity - $this->returned_quantity;
+    }
 }
