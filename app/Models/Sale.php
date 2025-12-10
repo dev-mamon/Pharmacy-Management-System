@@ -63,4 +63,9 @@ class Sale extends Model
     {
         return $this->belongsTo(Customer::class, 'customer_phone', 'phone');
     }
+
+     public function items()
+    {
+        return $this->hasMany(SaleItem::class);
+    }
 }

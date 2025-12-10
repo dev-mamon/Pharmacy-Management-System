@@ -43,7 +43,8 @@
                                     <option value="">Select Medicine</option>
                                     @foreach ($medicines as $medicine)
                                         <option value="{{ $medicine->id }}">{{ $medicine->name }}
-                                            ({{ $medicine->generic_name }})</option>
+                                            ({{ $medicine->generic_name }})
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('medicine_id')

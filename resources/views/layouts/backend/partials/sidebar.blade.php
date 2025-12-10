@@ -165,6 +165,18 @@
                     </span>
                 </a>
             </li>
+            <li>
+                <a wire:navigate href="{{ route('admin.medicine.barcode') }}"
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-300 text-gray-700 hover:bg-orange-50 hover:text-orange-500 hover:shadow-sm {{ request()->routeIs('admin.stock-transfers.*') ? 'bg-orange-50 text-orange-500 shadow-sm' : '' }}">
+                    <svg class="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M8 17l4 4 4-4m-4-4v12M3 3h18M3 9h18M3 15h18"></path>
+                    </svg>
+                    <span x-show="!sidebarCollapsed || sidebarHovered" x-transition class="whitespace-nowrap text-sm">
+                        Barcode
+                    </span>
+                </a>
+            </li>
         </ul>
 
         <div class="my-4 border-t border-gray-100"></div>

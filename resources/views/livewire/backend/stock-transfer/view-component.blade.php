@@ -1,232 +1,320 @@
 <main class="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-100 no-scrollbar">
-    <div class="space-y-6">
-        <!-- Header Section -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                    Stock Transfer Details
-                </h1>
-                <p class="text-sm text-gray-600 mt-1">
-                    View and manage stock transfer information
-                </p>
-            </div>
-
-            <div class="flex items-center gap-3 flex-wrap">
-                <a wire:navigate href="{{ route('stock-transfers.index') }}"
-                    class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all">
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    Back to List
-                </a>
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Stock Transfer Details</h1>
+                    <p class="text-sm text-gray-600 mt-1">Transfer #{{ $transfer->transfer_number }}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a wire:navigate href="{{ route('admin.stock-transfers.edit', $transfer->id) }}"
+                        class="bg-orange-500 text-white hover:bg-orange-600 px-4 py-2 rounded-lg text-sm transition-colors">
+                        Edit Transfer
+                    </a>
+                    <a wire:navigate href="{{ route('admin.stock-transfers.index') }}"
+                        class="bg-white text-gray-700 hover:text-gray-900 border border-gray-300 hover:border-gray-400 px-4 py-2 rounded-lg text-sm transition-colors">
+                        Back to List
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Flash Messages -->
         @if (session()->has('success'))
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
                 {{ session('success') }}
             </div>
         @endif
 
         @if (session()->has('error'))
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
                 {{ session('error') }}
             </div>
         @endif
 
-        <!-- Transfer Information Card -->
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
-            <!-- Card Header with Status -->
-            <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-800">Transfer #{{ $transfer->transfer_number }}</h2>
-                        <p class="text-sm text-gray-600 mt-1">
-                            Created on {{ $transfer->created_at->format('M d, Y \a\t h:i A') }} by
-                            {{ $transfer->user->name }}
-                        </p>
-                    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Transfer Details -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Transfer Overview Card -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Transfer Overview</h2>
 
-                    <!-- Status Badge -->
-                    @php
-                        $statusColors = [
-                            'pending' => 'bg-yellow-50 text-yellow-700 border-yellow-200',
-                            'approved' => 'bg-blue-50 text-blue-700 border-blue-200',
-                            'rejected' => 'bg-red-50 text-red-700 border-red-200',
-                            'completed' => 'bg-green-50 text-green-700 border-green-200',
-                        ];
-                    @endphp
-                    <span
-                        class="inline-flex items-center gap-1 px-3 py-1 text-sm rounded border {{ $statusColors[$transfer->status] }}">
-                        @if ($transfer->status === 'pending')
-                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span>
-                        @elseif($transfer->status === 'approved')
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                        @elseif($transfer->status === 'rejected')
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                        @else
-                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                        @endif
-                        {{ ucfirst($transfer->status) }}
-                    </span>
-                </div>
-            </div>
-
-            <!-- Card Body -->
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Transfer Details -->
-                    <div class="space-y-4">
-                        <h3 class="text-md font-semibold text-gray-800 mb-3">Transfer Details</h3>
-
-                        <div class="space-y-3">
-                            <div class="flex items-start">
-                                <div class="w-32 text-sm font-medium text-gray-500">From Branch:</div>
-                                <div class="text-sm text-gray-900">{{ $transfer->fromBranch->name }}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Basic Info -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500">Transfer Number</label>
+                                <p class="mt-1 text-lg font-semibold text-gray-900">{{ $transfer->transfer_number }}</p>
                             </div>
 
-                            <div class="flex items-start">
-                                <div class="w-32 text-sm font-medium text-gray-500">To Branch:</div>
-                                <div class="text-sm text-gray-900">{{ $transfer->toBranch->name }}</div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500">Transfer Date</label>
+                                <p class="mt-1 text-gray-900">{{ $transfer->transfer_date->format('F d, Y') }}</p>
                             </div>
 
-                            <div class="flex items-start">
-                                <div class="w-32 text-sm font-medium text-gray-500">Transfer Date:</div>
-                                <div class="text-sm text-gray-900">{{ $transfer->transfer_date->format('M d, Y') }}
-                                </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500">Created By</label>
+                                <p class="mt-1 text-gray-900">{{ $transfer->user->name ?? 'N/A' }}</p>
                             </div>
 
-                            <div class="flex items-start">
-                                <div class="w-32 text-sm font-medium text-gray-500">Total Items:</div>
-                                <div class="text-sm text-gray-900">{{ $transfer->items->count() }} items</div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500">Created At</label>
+                                <p class="mt-1 text-gray-900">{{ $transfer->created_at->format('F d, Y h:i A') }}</p>
                             </div>
-
-                            @if ($transfer->notes)
-                                <div class="flex items-start">
-                                    <div class="w-32 text-sm font-medium text-gray-500">Notes:</div>
-                                    <div class="text-sm text-gray-900">{{ $transfer->notes }}</div>
-                                </div>
-                            @endif
                         </div>
-                    </div>
 
-                    <!-- Action Buttons -->
-                    <div class="space-y-4">
-                        <h3 class="text-md font-semibold text-gray-800 mb-3">Actions</h3>
+                        <!-- Status & Branches -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500">Status</label>
+                                <div class="mt-1">
+                                    @if ($transfer->status === 'pending')
+                                        <span
+                                            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200 text-sm font-medium">
+                                            <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                            Pending
+                                        </span>
+                                    @elseif($transfer->status === 'approved')
+                                        <span
+                                            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-100 text-blue-800 border border-blue-200 text-sm font-medium">
+                                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                            Approved
+                                        </span>
+                                    @elseif($transfer->status === 'rejected')
+                                        <span
+                                            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 text-red-800 border border-red-200 text-sm font-medium">
+                                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                                            Rejected
+                                        </span>
+                                    @elseif($transfer->status === 'completed')
+                                        <span
+                                            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-800 border border-green-200 text-sm font-medium">
+                                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                            Completed
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
 
-                        <div class="space-y-2">
-                            @if ($transfer->status === 'pending')
-                                <div class="flex gap-2">
-                                    <button wire:click="approve"
-                                        class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                        <i class="fas fa-check mr-2"></i>
-                                        Approve
-                                    </button>
-
-                                    <button wire:click="reject"
-                                        wire:confirm="Are you sure you want to reject this transfer?"
-                                        class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-red-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-                                        <i class="fas fa-times mr-2"></i>
-                                        Reject
-                                    </button>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500">From Branch</label>
+                                    <p class="mt-1 text-gray-900 font-medium">{{ $transfer->fromBranch->name ?? 'N/A' }}
+                                    </p>
                                 </div>
 
-                                <div class="flex gap-2">
-                                    <a wire:navigate href="{{ route('stock-transfers.edit', $transfer->id) }}"
-                                        class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-orange-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
-                                        <i class="fas fa-edit mr-2"></i>
-                                        Edit
-                                    </a>
-
-                                    <button wire:click="delete"
-                                        wire:confirm="Are you sure you want to delete this transfer?"
-                                        class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                                        <i class="fas fa-trash mr-2"></i>
-                                        Delete
-                                    </button>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500">To Branch</label>
+                                    <p class="mt-1 text-gray-900 font-medium">{{ $transfer->toBranch->name ?? 'N/A' }}
+                                    </p>
                                 </div>
-                            @endif
+                            </div>
 
-                            @if ($transfer->status === 'approved')
-                                <button wire:click="complete"
-                                    class="w-full inline-flex justify-center items-center px-4 py-2 bg-green-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                                    <i class="fas fa-truck mr-2"></i>
-                                    Complete Transfer
-                                </button>
-                            @endif
+                            <!-- Status Actions -->
+                            @if ($transfer->status !== 'completed')
+                                <div class="pt-4">
+                                    <label class="block text-sm font-medium text-gray-500 mb-2">Update Status</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        @if ($transfer->status === 'pending')
+                                            <button wire:click="updateStatus('approved')"
+                                                class="px-3 py-1.5 bg-blue-500 text-white hover:bg-blue-600 rounded-lg text-sm">
+                                                Approve
+                                            </button>
+                                            <button wire:click="updateStatus('rejected')"
+                                                class="px-3 py-1.5 bg-red-500 text-white hover:bg-red-600 rounded-lg text-sm">
+                                                Reject
+                                            </button>
+                                        @endif
 
-                            @if ($transfer->status === 'completed')
-                                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                                        <div>
-                                            <p class="text-sm font-medium text-green-800">Transfer Completed</p>
-                                            <p class="text-xs text-green-600 mt-1">
-                                                All items have been transferred successfully.
-                                            </p>
-                                        </div>
+                                        @if (in_array($transfer->status, ['approved', 'pending']))
+                                            <button wire:click="updateStatus('completed')"
+                                                class="px-3 py-1.5 bg-green-500 text-white hover:bg-green-600 rounded-lg text-sm">
+                                                Mark as Completed
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endif
                         </div>
                     </div>
-                </div>
 
-                <!-- Items List -->
-                <div class="mt-8 border-t pt-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Transfer Items</h3>
-
-                    @if ($transfer->items->count() > 0)
-                        <div class="overflow-x-auto no-scrollbar scroll-hint">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead>
-                                    <tr class="bg-gray-50">
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Medicine</th>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Batch</th>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Expiry</th>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Quantity</th>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Notes</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach ($transfer->items as $item)
-                                        <tr class="hover:bg-gray-50">
-                                            <td class="px-4 py-3 text-sm text-gray-900">
-                                                {{ $item->stock->medicine->name }}
-                                            </td>
-                                            <td class="px-4 py-3 text-sm text-gray-600">
-                                                <code
-                                                    class="bg-gray-100 px-2 py-0.5 rounded">{{ $item->stock->batch_number }}</code>
-                                            </td>
-                                            <td class="px-4 py-3 text-sm text-gray-600">
-                                                {{ \Carbon\Carbon::parse($item->stock->expiry_date)->format('M d, Y') }}
-                                            </td>
-                                            <td class="px-4 py-3 text-sm text-gray-900 font-semibold">
-                                                {{ $item->quantity }}
-                                            </td>
-                                            <td class="px-4 py-3 text-sm text-gray-600">
-                                                {{ $item->notes ?? '-' }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-8 text-gray-500">
-                            <i class="far fa-box-open text-4xl text-gray-400 mb-3"></i>
-                            <p class="text-lg font-medium text-gray-900">No items in this transfer</p>
+                    <!-- Notes -->
+                    @if ($transfer->notes)
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <label class="block text-sm font-medium text-gray-500 mb-2">Notes</label>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <p class="text-gray-700 whitespace-pre-line">{{ $transfer->notes }}</p>
+                            </div>
                         </div>
                     @endif
+                </div>
+
+                <!-- Transfer Items Card -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Transfer Items</h2>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr class="text-sm font-medium text-gray-600 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left">#</th>
+                                    <th class="px-4 py-3 text-left">Medicine</th>
+                                    <th class="px-4 py-3 text-left">Quantity</th>
+                                    <th class="px-4 py-3 text-left">Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                @foreach ($transferItems as $index => $item)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 text-gray-600">{{ $index + 1 }}</td>
+                                        <td class="px-4 py-3">
+                                            <div class="font-medium text-gray-900">{{ $item->medicine->name }}</div>
+                                            <div class="text-sm text-gray-500">{{ $item->medicine->generic_name }}
+                                            </div>
+                                            @if ($item->medicine->form)
+                                                <div class="text-xs text-gray-400">{{ $item->medicine->form }} |
+                                                    {{ $item->medicine->strength }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-700 font-medium">
+                                            {{ $item->quantity }}
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600">
+                                            {{ $item->medicine->unit ?? 'pcs' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot class="bg-gray-50">
+                                <tr>
+                                    <td colspan="2" class="px-4 py-3 text-right font-medium text-gray-700">
+                                        Total:
+                                    </td>
+                                    <td class="px-4 py-3 font-bold text-gray-900">
+                                        {{ $totalQuantity }}
+                                    </td>
+                                    <td class="px-4 py-3"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Actions & Summary -->
+            <div class="space-y-6">
+                <!-- Summary Card -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Transfer Summary</h2>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Total Items</span>
+                            <span class="font-medium text-lg">{{ $transferItems->count() }}</span>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Total Quantity</span>
+                            <span class="font-medium text-lg">{{ $totalQuantity }}</span>
+                        </div>
+
+                        <div class="pt-4 border-t border-gray-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-gray-600">Last Updated</span>
+                                <span
+                                    class="text-sm text-gray-900">{{ $transfer->updated_at->format('M d, Y h:i A') }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 space-y-3">
+                        @if ($transfer->status !== 'completed')
+                            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <div class="flex items-center gap-2 text-yellow-800">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span class="text-sm font-medium">Action Required</span>
+                                </div>
+                                <p class="text-sm text-yellow-700 mt-1">
+                                    @if ($transfer->status === 'pending')
+                                        This transfer is pending approval.
+                                    @elseif($transfer->status === 'approved')
+                                        This transfer needs to be marked as completed after physical transfer.
+                                    @endif
+                                </p>
+                            </div>
+                        @endif
+
+                        <div class="flex flex-col gap-3">
+                            <a wire:navigate href="{{ route('admin.stock-transfers.edit', $transfer->id) }}"
+                                class="block w-full text-center bg-orange-500 text-white hover:bg-orange-600 px-4 py-3 rounded-lg font-medium transition-colors">
+                                Edit Transfer
+                            </a>
+
+                            <button wire:click="deleteTransfer"
+                                wire:confirm="Are you sure you want to delete this transfer? This will restore stock to the source branch."
+                                class="w-full bg-red-500 text-white hover:bg-red-600 px-4 py-3 rounded-lg font-medium transition-colors">
+                                Delete Transfer
+                            </button>
+
+                            <a wire:navigate href="{{ route('admin.stock-transfers.index') }}"
+                                class="block w-full text-center bg-white text-gray-700 hover:text-gray-900 border border-gray-300 hover:border-gray-400 px-4 py-3 rounded-lg font-medium transition-colors">
+                                Back to List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transfer Timeline -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Transfer Timeline</h2>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="mt-1">
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Transfer Created</p>
+                                <p class="text-xs text-gray-500">{{ $transfer->created_at->format('M d, Y h:i A') }}
+                                </p>
+                            </div>
+                        </div>
+
+                        @if ($transfer->status !== 'pending')
+                            <div class="flex items-start gap-3">
+                                <div class="mt-1">
+                                    <div
+                                        class="w-3 h-3 rounded-full
+                                        {{ $transfer->status === 'approved'
+                                            ? 'bg-blue-500'
+                                            : ($transfer->status === 'rejected'
+                                                ? 'bg-red-500'
+                                                : 'bg-green-500') }}">
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">
+                                        Status changed to {{ ucfirst($transfer->status) }}
+                                    </p>
+                                    <p class="text-xs text-gray-500">
+                                        {{ $transfer->updated_at->format('M d, Y h:i A') }}</p>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if ($transfer->status === 'completed')
+                            <div class="flex items-start gap-3">
+                                <div class="mt-1">
+                                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Stock Transferred</p>
+                                    <p class="text-xs text-gray-500">Stock has been moved to destination branch</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

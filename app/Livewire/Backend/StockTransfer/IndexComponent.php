@@ -17,7 +17,7 @@ class IndexComponent extends Component
     public $perPage = 10;
     public $medicineFilter = '';
     public $branchFilter = '';
-    public $statusFilter = ''; // replaced stockStatus
+    public $statusFilter = '';
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
 
@@ -43,6 +43,11 @@ class IndexComponent extends Component
     public function updatedSelectedTransfers()
     {
         $currentPageIds = $this->getCurrentPageTransferIds();
+        if (empty($currentPageIds)) {
+            $this->selectAll = false;
+            return;
+        }
+
         $selectedOnCurrentPage = array_intersect($this->selectedTransfers, $currentPageIds);
         $this->selectAll = count($selectedOnCurrentPage) === count($currentPageIds);
     }
@@ -50,7 +55,7 @@ class IndexComponent extends Component
     protected function getCurrentPageTransferIds()
     {
         if (empty($this->currentPageTransferIds)) {
-            $transfers = $this->transfers()->get();
+            $transfers = $this->transfersQuery()->get();
             $this->currentPageTransferIds = $transfers->pluck('id')->toArray();
         }
 
@@ -78,14 +83,18 @@ class IndexComponent extends Component
 
     public function selectAllTransfers()
     {
-        $allIds = $this->transfers()->pluck('id')->toArray();
+        $allIds = $this->transfersQuery()->pluck('id')->toArray();
         $this->selectedTransfers = $allIds;
 
         $currentPageIds = $this->getCurrentPageTransferIds();
-        $selectedOnCurrentPage = array_intersect($this->selectedTransfers, $currentPageIds);
 
-        $this->selectAll =
-            count($selectedOnCurrentPage) === count($currentPageIds);
+        if (empty($currentPageIds)) {
+            $this->selectAll = false;
+            return;
+        }
+
+        $selectedOnCurrentPage = array_intersect($this->selectedTransfers, $currentPageIds);
+        $this->selectAll = count($selectedOnCurrentPage) === count($currentPageIds);
     }
 
     public function deleteSelected()
@@ -147,7 +156,7 @@ class IndexComponent extends Component
     /**
      * Transfer query builder
      */
-    protected function transfers()
+    protected function transfersQuery()
     {
         return StockTransfer::with([
             'fromBranch',
@@ -179,14 +188,28 @@ class IndexComponent extends Component
 
     public function render()
     {
-        $transfers = $this->transfers()->paginate($this->perPage);
+        // Get paginated results first
+        $transfers = $this->transfersQuery()->paginate($this->perPage);
+
+        // Calculate statistics
+        $totalItems = StockTransfer::count();
+        $pendingTransfers = StockTransfer::where('status', 'pending')->count();
+        $inProgressTransfers = StockTransfer::where('status', 'in_progress')->count();
+        $completedTransfers = StockTransfer::where('status', 'completed')->count();
+
+        // Update current page IDs
+        $this->currentPageTransferIds = $transfers->pluck('id')->toArray();
 
         return view('livewire.backend.stock-transfer.index-component', [
             'transfers' => $transfers,
-            'medicines' => Medicine::all(),
-            'branches' => Branch::all(),
+            'medicines' => Medicine::all() ?? [],
+            'branches' => Branch::all() ?? [],
             'paginator' => $transfers,
             'pageRange' => $this->getPageRange($transfers),
+            'totalItems' => $totalItems,
+            'pendingTransfers' => $pendingTransfers,
+            'inProgressTransfers' => $inProgressTransfers,
+            'completedTransfers' => $completedTransfers,
         ])->layout('layouts.backend.app');
     }
 }

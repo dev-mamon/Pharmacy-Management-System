@@ -14,34 +14,24 @@ use Livewire\Component;
 class CreateComponent extends Component
 {
     public $medicineSearch = '';
-
+    public $dropdownSearch = '';
     public $customerSearch = '';
 
     public $medicineItems = [];
-
     public $customerName = '';
-
     public $customerPhone = '';
-
     public $customerId = null;
-
     public $notes = '';
-
     public $saleDate;
-
     public $branchId;
-
     public $paymentMethod = 'cash';
-
     public $discount = 0;
-
     public $taxRate = 0;
-
     public $subTotal = 0;
-
     public $taxAmount = 0;
-
     public $grandTotal = 0;
+    public $showMedicineDropdown = false;
+    public $showCustomerDropdown = false;
 
     protected $listeners = ['refresh' => '$refresh'];
 
@@ -49,40 +39,42 @@ class CreateComponent extends Component
     {
         $this->saleDate = now()->format('Y-m-d');
         $this->branchId = auth()->user()->branch_id ?? null;
-        $this->taxRate = 5;
+        $this->taxRate = 0;
     }
 
-    // Branch select করলে real-time update
     public function updatedBranchId($value)
     {
-        // Clear medicine items when branch changes
         $this->medicineItems = [];
         $this->medicineSearch = '';
+        $this->dropdownSearch = '';
+        $this->showMedicineDropdown = false;
         $this->calculateTotals();
-
-        // Dispatch event for UI updates
         $this->dispatch('branch-changed');
     }
 
-    // Real-time search for medicines with branch-specific stock
-    public function getSearchResultsProperty()
+    // Get filtered medicines for dropdown with search
+    public function getFilteredMedicinesProperty()
     {
-        if (strlen($this->medicineSearch) < 2 || ! $this->branchId) {
+        if (!$this->branchId) {
             return collect();
         }
 
-        return Medicine::with(['stocks' => function ($query) {
+        $query = Medicine::with(['stocks' => function ($query) {
             $query->where('branch_id', $this->branchId)
                 ->where('quantity', '>', 0);
         }])
-            ->where('is_active', true)
-            ->where(function ($query) {
-                $query->where('name', 'like', '%'.$this->medicineSearch.'%')
-                    ->orWhere('generic_name', 'like', '%'.$this->medicineSearch.'%')
-                    ->orWhere('brand_name', 'like', '%'.$this->medicineSearch.'%');
-            })
-            ->limit(10)
-            ->get()
+            ->where('is_active', true);
+
+        // Apply search filter
+        if ($this->dropdownSearch) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->dropdownSearch . '%')
+                  ->orWhere('generic_name', 'like', '%' . $this->dropdownSearch . '%')
+                  ->orWhere('brand_name', 'like', '%' . $this->dropdownSearch . '%');
+            });
+        }
+
+        return $query->get()
             ->map(function ($medicine) {
                 $stock = $medicine->stocks->first();
                 $medicine->current_stock = $stock ? $stock->quantity : 0;
@@ -98,49 +90,83 @@ class CreateComponent extends Component
             });
     }
 
-    // Real-time search for customers
-    public function getCustomerResultsProperty()
+    // Get filtered customers for dropdown with search
+    public function getFilteredCustomersProperty()
     {
-        if (strlen($this->customerSearch) < 2) {
+        if (empty($this->customerSearch)) {
             return collect();
         }
 
         return Customer::where('is_active', true)
             ->where(function ($query) {
-                $query->where('name', 'like', '%'.$this->customerSearch.'%')
-                    ->orWhere('phone', 'like', '%'.$this->customerSearch.'%')
-                    ->orWhere('customer_id', 'like', '%'.$this->customerSearch.'%');
+                $query->where('name', 'like', '%' . $this->customerSearch . '%')
+                    ->orWhere('phone', 'like', '%' . $this->customerSearch . '%')
+                    ->orWhere('customer_id', 'like', '%' . $this->customerSearch . '%');
             })
-            ->limit(10)
+            ->limit(15)
             ->get();
+    }
+
+    // Show medicine dropdown
+    public function showMedicineDropdown()
+    {
+        if (!$this->branchId) {
+            session()->flash('error', 'Please select a branch first!');
+            return;
+        }
+
+        $this->showMedicineDropdown = true;
+        $this->dropdownSearch = '';
+        $this->dispatch('focus-dropdown-search');
+    }
+
+    // Show customer dropdown
+    public function showCustomerDropdown()
+    {
+        $this->showCustomerDropdown = true;
+        $this->customerSearch = '';
+        $this->dispatch('focus-customer-search');
+    }
+
+    // Select medicine from dropdown
+    public function selectMedicineFromDropdown($medicineId)
+    {
+        $this->selectMedicine($medicineId);
+        // Keep dropdown open after selection
+        $this->dropdownSearch = '';
+    }
+
+    // Select customer from dropdown
+    public function selectCustomerFromDropdown($customerId)
+    {
+        $this->selectCustomer($customerId);
+        // Keep dropdown open after selection
+        $this->customerSearch = '';
     }
 
     // Select medicine with branch-specific stock
     public function selectMedicine($medicineId)
     {
-        if (! $this->branchId) {
+        if (!$this->branchId) {
             session()->flash('error', 'Please select a branch first!');
-
             return;
         }
 
         $medicine = Medicine::with(['stocks' => function ($query) {
             $query->where('branch_id', $this->branchId)
                 ->where('quantity', '>', 0)
-                ->orderBy('expiry_date'); // First expire first out
+                ->orderBy('expiry_date');
         }])->find($medicineId);
 
-        if (! $medicine) {
+        if (!$medicine) {
             session()->flash('error', 'Medicine not found!');
-
             return;
         }
 
         $stock = $medicine->stocks->first();
 
-        if (! $stock) {
+        if (!$stock) {
             session()->flash('error', 'No stock available for this medicine in selected branch!');
-
             return;
         }
 
@@ -149,24 +175,19 @@ class CreateComponent extends Component
 
         if ($availableStock <= 0) {
             session()->flash('error', 'No stock available for this medicine!');
-
             return;
         }
 
         // Check if medicine already exists in items
         foreach ($this->medicineItems as $index => $item) {
             if ($item['medicine_id'] == $medicine->id && $item['stock_id'] == $stock->id) {
-                // Update quantity if already exists
                 $newQuantity = $item['quantity'] + 1;
                 if ($newQuantity <= $availableStock) {
                     $this->medicineItems[$index]['quantity'] = $newQuantity;
                     $this->calculateTotals();
-                    $this->medicineSearch = '';
-
                     return;
                 } else {
                     session()->flash('error', 'Cannot add more. Stock limit reached!');
-
                     return;
                 }
             }
@@ -186,7 +207,6 @@ class CreateComponent extends Component
             'purchase_price' => $stock->purchase_price,
         ];
 
-        $this->medicineSearch = '';
         $this->calculateTotals();
     }
 
@@ -199,7 +219,8 @@ class CreateComponent extends Component
             $this->customerId = $customer->id;
             $this->customerName = $customer->name;
             $this->customerPhone = $customer->phone;
-            $this->customerSearch = '';
+            $this->customerSearch = $customer->name; // Keep search term
+            $this->showCustomerDropdown = false; // Close dropdown after selection
         }
     }
 
@@ -210,6 +231,7 @@ class CreateComponent extends Component
         $this->customerName = '';
         $this->customerPhone = '';
         $this->customerSearch = '';
+        $this->showCustomerDropdown = false;
     }
 
     // Real-time updates for medicine items
@@ -222,7 +244,6 @@ class CreateComponent extends Component
                 if (in_array($field, ['quantity', 'unit_price'])) {
                     $this->medicineItems[$index][$field] = floatval($value);
 
-                    // Validate quantity against stock
                     if ($field === 'quantity' && isset($this->medicineItems[$index]['stock_quantity'])) {
                         $maxQuantity = $this->medicineItems[$index]['stock_quantity'];
                         if ($value > $maxQuantity) {
@@ -243,6 +264,11 @@ class CreateComponent extends Component
         if (in_array($propertyName, ['discount', 'taxRate'])) {
             $this->{$propertyName} = floatval($value);
             $this->calculateTotals();
+        }
+
+        // Show dropdown when typing in customer search
+        if ($propertyName === 'customerSearch' && !empty($value)) {
+            $this->showCustomerDropdown = true;
         }
     }
 
@@ -269,24 +295,7 @@ class CreateComponent extends Component
 
     public function addMedicineItem()
     {
-        if (! $this->branchId) {
-            session()->flash('error', 'Please select a branch first!');
-
-            return;
-        }
-
-        $this->medicineItems[] = [
-            'medicine_id' => null,
-            'medicine_name' => '',
-            'generic_name' => '',
-            'stock_id' => null,
-            'batch_number' => '',
-            'expiry_date' => '',
-            'stock_quantity' => 0,
-            'quantity' => 1,
-            'unit_price' => 0,
-            'purchase_price' => 0,
-        ];
+        $this->showMedicineDropdown();
     }
 
     public function removeMedicineItem($index)
@@ -338,17 +347,15 @@ class CreateComponent extends Component
             if ($this->customerId) {
                 $customer = Customer::find($this->customerId);
             } else {
-                // Check if customer exists with same phone
                 $customer = Customer::where('phone', $this->customerPhone)->first();
 
-                if (! $customer && $this->customerPhone) {
-                    // Generate unique customer ID
+                if (!$customer && $this->customerPhone) {
                     $customerId = 'CUST-'.str_pad(Customer::count() + 1, 6, '0', STR_PAD_LEFT);
 
                     $customer = Customer::create(array_merge($customerData, [
                         'customer_id' => $customerId,
                     ]));
-                } elseif (! $this->customerPhone) {
+                } elseif (!$this->customerPhone) {
                     $customer = null;
                 }
             }
@@ -387,10 +394,9 @@ class CreateComponent extends Component
 
             // Create sale items and update stock
             foreach ($this->medicineItems as $item) {
-                // Find the specific stock record
                 $stock = Stock::find($item['stock_id']);
 
-                if (! $stock) {
+                if (!$stock) {
                     throw new \Exception('Stock not found for medicine: '.$item['medicine_name']);
                 }
 
@@ -398,10 +404,8 @@ class CreateComponent extends Component
                     throw new \Exception('Insufficient stock for '.$item['medicine_name'].'. Available: '.$stock->quantity);
                 }
 
-                // Calculate profit for this item
                 $itemProfit = ($item['unit_price'] - $item['purchase_price']) * $item['quantity'];
 
-                // Create sale item
                 SaleItem::create([
                     'sale_id' => $sale->id,
                     'medicine_id' => $item['medicine_id'],
@@ -415,17 +419,13 @@ class CreateComponent extends Component
                     'profit' => $itemProfit,
                 ]);
 
-                // Update stock quantity in stocks table
                 $stock->decrement('quantity', $item['quantity']);
-
-                // Update total sold in medicines table
                 Medicine::where('id', $item['medicine_id'])->increment('total_sold', $item['quantity']);
             }
 
-            // Update customer loyalty points and total spent if customer exists
+            // Update customer loyalty points
             if ($customer) {
                 $customer->increment('total_spent', $this->grandTotal);
-                // Add loyalty points (e.g., 1 point for every 100 TK spent)
                 $loyaltyPoints = floor($this->grandTotal / 100);
                 if ($loyaltyPoints > 0) {
                     $customer->increment('loyalty_points', $loyaltyPoints);
@@ -436,7 +436,6 @@ class CreateComponent extends Component
 
             session()->flash('message', 'Sale created successfully! Invoice #'.$invoiceNumber);
 
-            // Redirect to view page
             return redirect()->route('admin.sales.view', $sale->id);
 
         } catch (\Exception $e) {
@@ -456,11 +455,14 @@ class CreateComponent extends Component
             'notes',
             'discount',
             'medicineSearch',
+            'dropdownSearch',
             'subTotal',
             'taxAmount',
             'grandTotal',
+            'showMedicineDropdown',
+            'showCustomerDropdown',
         ]);
-        $this->taxRate = 5;
+        $this->taxRate = 0;
         $this->dispatch('form-reset');
     }
 
@@ -470,8 +472,8 @@ class CreateComponent extends Component
 
         return view('livewire.backend.sale.create-component', [
             'branches' => $branches,
-            'searchResults' => $this->searchResults,
-            'customerResults' => $this->customerResults,
+            'filteredMedicines' => $this->filteredMedicines,
+            'filteredCustomers' => $this->filteredCustomers,
         ])->layout('layouts.backend.app');
     }
 }

@@ -57,8 +57,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Stock Transfers
     Route::get('/stock-transfers', \App\Livewire\Backend\StockTransfer\IndexComponent::class)->name('stock-transfers.index');
     Route::get('/stock-transfers/create', \App\Livewire\Backend\StockTransfer\CreateComponent::class)->name('stock-transfers.create');
-    Route::get('/stock-transfers/{stockTransfer}/edit', \App\Livewire\Backend\StockTransfer\EditComponent::class)->name('stock-transfers.edit');
-    Route::get('/stock-transfers/{stockTransfer}', \App\Livewire\Backend\StockTransfer\ViewComponent::class)->name('stock-transfers.view');
+    Route::get('/stock-transfers/{id}/edit', \App\Livewire\Backend\StockTransfer\EditComponent::class)->name('stock-transfers.edit');
+    Route::get('/stock-transfers/{id}', \App\Livewire\Backend\StockTransfer\ViewComponent::class)->name('stock-transfers.view');
 
     // Sales & POS
     // POS System
@@ -117,6 +117,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/reports/inventory', \App\Livewire\Backend\Report\InventoryReportComponent::class)->name('reports.inventory');
     Route::get('/reports/financial', \App\Livewire\Backend\Report\FinancialReportComponent::class)->name('reports.financial');
     Route::get('/reports/customers', \App\Livewire\Backend\Report\CustomerReportComponent::class)->name('reports.customers');
+    // barcode generate
+    Route::get('/medicine/barcode', \App\Livewire\Backend\Barcode\IndexComponent::class)->name('medicine.barcode');
+    Route::get('/medicine/create', \App\Livewire\Backend\Barcode\CreateComponent::class)->name('medicine.barcode.create');
+    Route::get('/medicine/{barcode}/edit', \App\Livewire\Backend\Barcode\EditComponent::class)->name('medicine.barcode.edit');
+    Route::get('/medicine/{barcode}/view', \App\Livewire\Backend\Barcode\ViewComponent::class)->name('medicine.barcode.view');
 
     // System Management
     // Users

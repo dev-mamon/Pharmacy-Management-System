@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             PurchaseSeeder::class,
             StockTransferSeeder::class,
             SaleSeeder::class,
+            // BarcodeSeeder::class,
         ]);
     }
 }

@@ -2,110 +2,109 @@
 
 namespace App\Livewire\Backend\StockTransfer;
 
+use Livewire\Component;
 use App\Models\StockTransfer;
 use Illuminate\Support\Facades\DB;
-use Livewire\Component;
 
 class ViewComponent extends Component
 {
     public $transfer;
+    public $transferItems;
 
-    public function mount(StockTransfer $transfer)
+    public function mount($id)
     {
-        $this->transfer = $transfer->load([
+        $this->transfer = StockTransfer::with([
             'fromBranch',
             'toBranch',
             'user',
-            'items.stock.medicine'
-        ]);
+            'transferItems.medicine'
+        ])->findOrFail($id);
+
+        $this->transferItems = $this->transfer->transferItems;
     }
 
-    public function approve()
+    public function updateStatus($status)
     {
-        if ($this->transfer->status !== 'pending') {
-            session()->flash('error', 'Only pending transfers can be approved.');
+        $validStatuses = ['pending', 'approved', 'rejected', 'completed'];
+
+        if (!in_array($status, $validStatuses)) {
+            session()->flash('error', 'Invalid status.');
             return;
         }
 
-        $this->transfer->update(['status' => 'approved']);
-        session()->flash('success', 'Transfer approved successfully.');
-        $this->redirect(route('stock-transfers.view', $this->transfer->id), navigate: true);
-    }
-
-    public function reject()
-    {
-        if ($this->transfer->status !== 'pending') {
-            session()->flash('error', 'Only pending transfers can be rejected.');
-            return;
-        }
-
-        $this->transfer->update(['status' => 'rejected']);
-        session()->flash('success', 'Transfer rejected.');
-        $this->redirect(route('stock-transfers.view', $this->transfer->id), navigate: true);
-    }
-
-    public function complete()
-    {
-        if ($this->transfer->status !== 'approved') {
-            session()->flash('error', 'Only approved transfers can be completed.');
-            return;
-        }
+        DB::beginTransaction();
 
         try {
-            DB::beginTransaction();
+            $oldStatus = $this->transfer->status;
+            $this->transfer->update(['status' => $status]);
 
-            // Process each item
-            foreach ($this->transfer->items as $item) {
-                // Deduct from source branch
-                $sourceStock = $item->stock;
-                if ($sourceStock->quantity < $item->quantity) {
-                    throw new \Exception("Insufficient stock for {$item->stock->medicine->name}");
-                }
-                $sourceStock->decrement('quantity', $item->quantity);
-
-                // Add to destination branch (or create new stock record)
-                // This is a simplified version - you might need more complex logic
-                $destinationStock = \App\Models\Stock::firstOrCreate([
-                    'branch_id' => $this->transfer->to_branch_id,
-                    'medicine_id' => $item->stock->medicine_id,
-                    'batch_number' => $item->stock->batch_number,
-                    'expiry_date' => $item->stock->expiry_date,
-                ], [
-                    'quantity' => 0,
-                    'purchase_price' => $item->stock->purchase_price,
-                    'selling_price' => $item->stock->selling_price,
-                ]);
-
-                $destinationStock->increment('quantity', $item->quantity);
+            // Handle status-specific actions
+            if ($status === 'completed' && $oldStatus !== 'completed') {
+                $this->completeTransfer();
             }
-
-            $this->transfer->update(['status' => 'completed']);
 
             DB::commit();
 
-            session()->flash('success', 'Transfer completed successfully.');
-            $this->redirect(route('admin.stock-transfers.view', $this->transfer->id), navigate: true);
+            session()->flash('success', 'Transfer status updated to ' . ucfirst($status));
+            $this->transfer->refresh();
 
         } catch (\Exception $e) {
             DB::rollBack();
-            session()->flash('error', 'Failed to complete transfer: ' . $e->getMessage());
+            session()->flash('error', 'Failed to update status: ' . $e->getMessage());
         }
     }
 
-    public function delete()
+    protected function completeTransfer()
     {
-        if ($this->transfer->status !== 'pending') {
-            session()->flash('error', 'Only pending transfers can be deleted.');
-            return;
-        }
+        // Additional logic when transfer is completed
+        // For example, create stock movement logs, notifications, etc.
 
-        $this->transfer->delete();
-        session()->flash('success', 'Transfer deleted successfully.');
-        $this->redirect('/admin/stock-transfers', navigate: true);
+        // For now, just update the status
+        return true;
+    }
+
+    public function deleteTransfer()
+    {
+        DB::beginTransaction();
+
+        try {
+            // Restore stock for all items
+            foreach ($this->transferItems as $item) {
+                // Restore stock to source branch
+                $stock = \App\Models\Stock::where('branch_id', $this->transfer->from_branch_id)
+                    ->where('medicine_id', $item->medicine_id)
+                    ->first();
+
+                if ($stock) {
+                    $stock->increment('quantity', $item->quantity);
+                }
+            }
+
+            // Delete the transfer
+            $this->transfer->delete();
+
+            DB::commit();
+
+            session()->flash('success', 'Transfer deleted successfully.');
+            return redirect()->route('admin.stock-transfers.index');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Failed to delete transfer: ' . $e->getMessage());
+        }
+    }
+
+    public function getTotalQuantity()
+    {
+        return $this->transferItems->sum('quantity');
     }
 
     public function render()
     {
-        return view('livewire.backend.stock-transfer.view-component')->layout('layouts.backend.app');
+        return view('livewire.backend.stock-transfer.view-component', [
+            'transfer' => $this->transfer,
+            'transferItems' => $this->transferItems,
+            'totalQuantity' => $this->getTotalQuantity(),
+        ])->layout('layouts.backend.app');
     }
 }

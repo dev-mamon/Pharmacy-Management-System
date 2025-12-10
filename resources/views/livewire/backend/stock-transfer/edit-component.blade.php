@@ -1,265 +1,283 @@
 <main class="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-100 no-scrollbar">
-    <div class="space-y-6">
-        <!-- Header Section -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                    {{ $isEditing ? 'Edit Stock Transfer' : 'Create New Stock Transfer' }}
-                </h1>
-                <p class="text-sm text-gray-600 mt-1">
-                    {{ $isEditing ? 'Update stock transfer details' : 'Transfer inventory between branches' }}
-                </p>
-            </div>
-
-            <div class="flex items-center gap-3 flex-wrap">
-                <a wire:navigate href="{{ route('stock-transfers.index') }}"
-                    class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all">
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    Back to List
-                </a>
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Edit Stock Transfer</h1>
+                    <p class="text-sm text-gray-600 mt-1">Transfer #{{ $transfer_number }}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a wire:navigate href="{{ route('admin.stock-transfers.view', $transfer_id) }}"
+                        class="bg-white text-gray-700 hover:text-gray-900 border border-gray-300 hover:border-gray-400 px-4 py-2 rounded-lg text-sm transition-colors">
+                        View Transfer
+                    </a>
+                    <a wire:navigate href="{{ route('admin.stock-transfers.index') }}"
+                        class="bg-white text-gray-700 hover:text-gray-900 border border-gray-300 hover:border-gray-400 px-4 py-2 rounded-lg text-sm transition-colors">
+                        Back to List
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Flash Messages -->
         @if (session()->has('success'))
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
                 {{ session('success') }}
             </div>
         @endif
 
         @if (session()->has('error'))
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
                 {{ session('error') }}
             </div>
         @endif
 
-        <!-- Transfer Form Card -->
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
-            <!-- Card Header -->
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-800">Transfer Information</h2>
-                <p class="text-sm text-gray-600 mt-1">Fill in the details for the stock transfer.</p>
-            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Transfer Details -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Transfer Information Card -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Transfer Information</h2>
 
-            <!-- Card Body -->
-            <div class="p-6">
-                <form wire:submit.prevent="save">
-                    <div class="space-y-6">
-                        <!-- Transfer Details -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- From Branch -->
-                            <div>
-                                <label for="from_branch_id" class="block text-sm font-medium text-gray-700 mb-1">
-                                    From Branch <span class="text-red-500">*</span>
-                                </label>
-                                <select id="from_branch_id" wire:model.live="from_branch_id"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
-                                    {{ $isEditing ? 'disabled' : '' }}>
-                                    <option value="">Select branch</option>
-                                    @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('from_branch_id')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- To Branch -->
-                            <div>
-                                <label for="to_branch_id" class="block text-sm font-medium text-gray-700 mb-1">
-                                    To Branch <span class="text-red-500">*</span>
-                                </label>
-                                <select id="to_branch_id" wire:model="to_branch_id"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition">
-                                    <option value="">Select branch</option>
-                                    @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('to_branch_id')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Transfer Date -->
-                            <div>
-                                <label for="transfer_date" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Transfer Date <span class="text-red-500">*</span>
-                                </label>
-                                <input type="date" id="transfer_date" wire:model="transfer_date"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition">
-                                @error('transfer_date')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Transfer Number -->
-                            @if ($isEditing && $transfer_number)
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                                        Transfer Number
-                                    </label>
-                                    <div class="w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded-md">
-                                        <code class="text-sm font-mono">{{ $transfer_number }}</code>
-                                    </div>
-                                </div>
-                            @endif
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Transfer Number -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Transfer Number</label>
+                            <input type="text" value="{{ $transfer_number }}" readonly
+                                class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-500">
                         </div>
 
-                        <!-- Notes -->
+                        <!-- Transfer Date -->
                         <div>
-                            <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
-                                Notes
-                            </label>
-                            <textarea id="notes" wire:model="notes" rows="3" placeholder="Add any notes about this transfer..."
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"></textarea>
-                            @error('notes')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Transfer Date *</label>
+                            <input type="date" wire:model="transfer_date"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            @error('transfer_date')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
 
-                        <!-- Add Items Section -->
-                        <div class="border-t pt-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-lg font-semibold text-gray-800">Transfer Items</h3>
-                                <div class="text-sm text-gray-600">
-                                    Total Items: <span class="font-bold">{{ count($items) }}</span>
-                                </div>
-                            </div>
-
-                            @if ($from_branch_id)
-                                <!-- Add Item Form -->
-                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                                    <h4 class="text-sm font-medium text-gray-800 mb-3">Add New Item</h4>
-
-                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <!-- Select Medicine -->
-                                        <div class="md:col-span-2">
-                                            <label class="block text-xs font-medium text-gray-700 mb-1">
-                                                Select Medicine
-                                            </label>
-                                            <select wire:model="selectedStock"
-                                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm">
-                                                <option value="">Select medicine</option>
-                                                @foreach ($availableStocks as $stock)
-                                                    <option value="{{ $stock->id }}">
-                                                        {{ $stock->medicine->name }}
-                                                        (Batch: {{ $stock->batch_number }}, Available:
-                                                        {{ $stock->quantity }})
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <!-- Quantity -->
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-700 mb-1">
-                                                Quantity
-                                            </label>
-                                            <input type="number" wire:model="selectedQuantity" min="1"
-                                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm">
-                                        </div>
-
-                                        <!-- Add Button -->
-                                        <div class="flex items-end">
-                                            <button type="button" wire:click="addItem"
-                                                class="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                                <i class="fas fa-plus mr-2"></i>
-                                                Add Item
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Item Notes -->
-                                    <div class="mt-3">
-                                        <label class="block text-xs font-medium text-gray-700 mb-1">
-                                            Item Notes (Optional)
-                                        </label>
-                                        <input type="text" wire:model="itemNotes"
-                                            placeholder="Enter notes for this item..."
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm">
-                                    </div>
-                                </div>
-                            @else
-                                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-                                    <p class="text-yellow-700">Please select a "From Branch" to view available medicines
-                                    </p>
-                                </div>
-                            @endif
-
-                            <!-- Items List -->
-                            @if (count($items) > 0)
-                                <div class="space-y-3">
-                                    @foreach ($items as $index => $item)
-                                        <div
-                                            class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                            <div class="flex-1">
-                                                <div class="flex items-start justify-between">
-                                                    <div class="flex-1">
-                                                        <h4 class="font-medium text-gray-900">
-                                                            {{ $item['stock']['medicine']['name'] }}</h4>
-                                                        <div
-                                                            class="flex flex-wrap items-center gap-4 mt-1 text-sm text-gray-600">
-                                                            <span>Batch: <code
-                                                                    class="bg-gray-100 px-2 py-0.5 rounded">{{ $item['stock']['batch_number'] }}</code></span>
-                                                            <span>Available: <span
-                                                                    class="font-semibold">{{ $item['stock']['quantity'] }}</span></span>
-                                                            <span>Transfer: <span
-                                                                    class="font-bold text-orange-600">{{ $item['quantity'] }}</span></span>
-                                                            <span>Expiry:
-                                                                {{ \Carbon\Carbon::parse($item['stock']['expiry_date'])->format('M d, Y') }}</span>
-                                                        </div>
-                                                        @if ($item['notes'])
-                                                            <p class="mt-2 text-sm text-gray-500">
-                                                                <i class="far fa-sticky-note mr-1"></i>
-                                                                {{ $item['notes'] }}
-                                                            </p>
-                                                        @endif
-                                                    </div>
-
-                                                    <button type="button"
-                                                        wire:click="removeItem({{ $index }})"
-                                                        class="ml-4 p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-md">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @else
-                                <div class="text-center py-8 text-gray-500">
-                                    <i class="far fa-box-open text-4xl text-gray-400 mb-3"></i>
-                                    <p class="text-lg font-medium text-gray-900">No items added</p>
-                                    <p class="text-sm text-gray-600 mt-1">
-                                        {{ $from_branch_id ? 'Add items to this transfer' : 'Select a "From Branch" to add items' }}
-                                    </p>
-                                </div>
-                            @endif
+                        <!-- From Branch -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">From Branch *</label>
+                            <select wire:model.live="from_branch_id"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                <option value="">Select Branch</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('from_branch_id')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
 
-                        <!-- Error for empty items -->
-                        @error('items')
-                            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
+                        <!-- To Branch -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">To Branch *</label>
+                            <select wire:model="to_branch_id"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                <option value="">Select Branch</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('to_branch_id')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
 
-                    <!-- Form Actions -->
-                    <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-3">
-                        <a wire:navigate href="{{ route('stock-transfers.index') }}"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition">
-                            Cancel
-                        </a>
-                        <button type="submit" {{ count($items) === 0 ? 'disabled' : '' }}
-                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                            <i class="fas fa-check mr-2"></i>
-                            {{ $isEditing ? 'Update Transfer' : 'Create Transfer' }}
+                        <!-- Status -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status *</label>
+                            <select wire:model="status"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                            @error('status')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                            <textarea wire:model="notes" rows="3"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                placeholder="Any additional notes..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transfer Items Card -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-900">Transfer Items</h2>
+                        <button type="button" wire:click="addItem"
+                            class="bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200 px-3 py-1 rounded-lg text-sm font-medium">
+                            + Add Item
                         </button>
                     </div>
-                </form>
+
+                    @foreach ($items as $index => $item)
+                        <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                            <div class="flex items-start justify-between mb-3">
+                                <h3 class="font-medium text-gray-900">Item #{{ $index + 1 }}</h3>
+                                @if ($index > 0 || (count($items) === 1 && empty($item['medicine_id'])))
+                                    <button type="button" wire:click="removeItem({{ $index }})"
+                                        class="text-red-500 hover:text-red-700">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                @endif
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <!-- Medicine Dropdown -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Medicine *</label>
+                                    <select wire:model.live="items.{{ $index }}.medicine_id"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                        <option value="">Select Medicine</option>
+                                        @foreach ($medicineOptions as $medicineOption)
+                                            <option value="{{ $medicineOption['medicine_id'] }}">
+                                                {{ $medicineOption['medicine_name'] }}
+                                                ({{ $medicineOption['generic_name'] }})
+                                                @if (count($medicineOption['batches']) > 1)
+                                                    - {{ count($medicineOption['batches']) }} batches
+                                                @endif
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    @if ($item['medicine_name'])
+                                        <div class="mt-2 text-xs text-gray-600">
+                                            <div><strong>Batch:</strong> {{ $item['batch_number'] }}</div>
+                                            <div><strong>Expiry:</strong> {{ $item['expiry_date'] }}</div>
+                                            <div><strong>Unit Price:</strong>
+                                                ৳{{ number_format($item['unit_price'], 2) }}</div>
+                                        </div>
+                                    @endif
+
+                                    @error('items.' . $index . '.medicine_id')
+                                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- Available Quantity -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Available</label>
+                                    <div
+                                        class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-500">
+                                        {{ $item['available_quantity'] }}
+                                    </div>
+                                </div>
+
+                                <!-- Quantity -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
+                                    <input type="number" wire:model.live="items.{{ $index }}.quantity"
+                                        min="1" max="{{ $item['available_quantity'] }}"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    @error('items.' . $index . '.quantity')
+                                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- Unit Price -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Unit Price *</label>
+                                    <input type="number" wire:model.live="items.{{ $index }}.unit_price"
+                                        step="0.01"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    @error('items.' . $index . '.unit_price')
+                                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- Total Price -->
+                                <div class="md:col-span-2 lg:col-span-1">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Total</label>
+                                    <div
+                                        class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-500 font-medium">
+                                        ৳{{ number_format($item['total_price'], 2) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Right Column: Summary & Actions -->
+            <div class="space-y-6">
+                <!-- Summary Card -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Transfer Summary</h2>
+
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Total Items</span>
+                            <span class="font-medium">{{ $totalItems }}</span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Total Quantity</span>
+                            <span class="font-medium">
+                                {{ array_sum(array_column($items, 'quantity')) }}
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Grand Total</span>
+                            <span class="font-medium text-lg text-orange-600">
+                                ৳{{ number_format($grandTotal, 2) }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <button type="button" wire:click="update" wire:loading.attr="disabled"
+                            class="w-full bg-orange-500 text-white hover:bg-orange-600 px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-save"></i>
+                            Update Transfer
+                            <span wire:loading wire:target="update">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
+
+                        <a wire:navigate href="{{ route('admin.stock-transfers.index') }}"
+                            class="block w-full text-center mt-3 bg-white text-gray-700 hover:text-gray-900 border border-gray-300 hover:border-gray-400 px-4 py-3 rounded-lg font-medium transition-colors">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Important Notes -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                    <h3 class="font-medium text-yellow-900 mb-2">Important Notes</h3>
+                    <ul class="text-sm text-yellow-800 space-y-2">
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-exclamation-triangle mt-0.5"></i>
+                            <span>Changing the source branch will clear all selected medicines</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-exclamation-triangle mt-0.5"></i>
+                            <span>Removing items will restore stock to the source branch</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-exclamation-triangle mt-0.5"></i>
+                            <span>Stock adjustments happen immediately when you update</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-info-circle mt-0.5"></i>
+                            <span>Set status to "Completed" only when transfer is physically done</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

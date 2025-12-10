@@ -5,6 +5,7 @@ namespace App\Livewire\Backend\Sale;
 use Livewire\Component;
 use App\Models\Sale;
 use App\Models\Stock;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 
 class ViewComponent extends Component
@@ -21,6 +22,7 @@ class ViewComponent extends Component
         try {
             $this->sale->update(['status' => 'completed']);
             session()->flash('message', 'Sale marked as completed!');
+            $this->dispatch('sale-updated');
         } catch (\Exception $e) {
             session()->flash('error', 'Error updating sale: ' . $e->getMessage());
         }
@@ -44,6 +46,7 @@ class ViewComponent extends Component
 
             DB::commit();
             session()->flash('message', 'Sale cancelled and stock returned successfully!');
+            $this->dispatch('sale-updated');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -53,7 +56,15 @@ class ViewComponent extends Component
 
     public function printInvoice()
     {
-        $this->dispatch('print-invoice', saleId: $this->sale->id);
+        $pdf = Pdf::loadView('pdf.sale-invoice', ['sale' => $this->sale]);
+
+        // Return PDF for download
+        return response()->streamDownload(
+            function () use ($pdf) {
+                echo $pdf->stream();
+            },
+            'invoice-' . $this->sale->invoice_number . '.pdf'
+        );
     }
 
     public function render()
