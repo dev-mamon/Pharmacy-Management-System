@@ -274,5 +274,6 @@
             </div>
         </div>
     </div>
-    {{-- new code --}}
+    {{-- new code start --}}
+    {{-- new code end --}}
 </main>
